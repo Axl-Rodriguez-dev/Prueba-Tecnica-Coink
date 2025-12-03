@@ -14,5 +14,9 @@ public class AutoMapperProfiles : Profile
             .ForMember(dest => dest.Municipality, opt => opt.MapFrom(src => src.Municipality == null ? string.Empty : src.Municipality.Name));
 
         CreateMap<CreateUserDto, AppUser>();
+
+        CreateMap<Country, CountryDto>();
+        CreateMap<Department, DepartmentDto>();
+        CreateMap<Municipality, MunicipalityDto>();
     }
 }
