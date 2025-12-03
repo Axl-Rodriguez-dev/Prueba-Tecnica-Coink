@@ -106,6 +106,152 @@ namespace API.Migrations
                 table: "Users",
                 column: "Phone",
                 unique: true);
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_country_exists(p_country_id int)
+                RETURNS boolean AS $$
+                BEGIN
+                    RETURN EXISTS(SELECT 1 FROM ""Countries"" c WHERE c.""Id"" = p_country_id);
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_department_exists(p_department_id int)
+                RETURNS boolean AS $$
+                BEGIN
+                    RETURN EXISTS(SELECT 1 FROM ""Departments"" d WHERE d.""Id"" = p_department_id);
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_municipality_exists(p_municipality_id int)
+                RETURNS boolean AS $$
+                BEGIN
+                    RETURN EXISTS(SELECT 1 FROM ""Municipalities"" m WHERE m.""Id"" = p_municipality_id);
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+      
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_create_user(
+                    p_name text,
+                    p_phone text,
+                    p_country_id int,
+                    p_department_id int,
+                    p_municipality_id int,
+                    p_direction text
+                )
+                RETURNS TABLE(
+                    ""Id"" int,
+                    ""Name"" text,
+                    ""Phone"" text,
+                    ""CountryId"" int,
+                    ""DepartmentId"" int,
+                    ""MunicipalityId"" int,
+                    ""Direction"" text,
+                    ""CountryName"" text,
+                    ""DepartmentName"" text,
+                    ""MunicipalityName"" text
+                )
+                AS $$
+                DECLARE new_id int;
+                BEGIN
+                    INSERT INTO ""Users"" (""Name"", ""Phone"", ""CountryId"", ""DepartmentId"", ""MunicipalityId"", ""Direction"")
+                    VALUES (p_name, p_phone, p_country_id, p_department_id, p_municipality_id, p_direction)
+                    RETURNING ""Id"" INTO new_id;
+
+                    RETURN QUERY
+                    SELECT
+                        u.""Id"", u.""Name"", u.""Phone"", u.""CountryId"", u.""DepartmentId"", u.""MunicipalityId"", u.""Direction"",
+                        c.""Name"" AS ""CountryName"",
+                        d.""Name"" AS ""DepartmentName"",
+                        m.""Name"" AS ""MunicipalityName""
+                    FROM ""Users"" u
+                    JOIN ""Countries"" c ON c.""Id"" = u.""CountryId""
+                    JOIN ""Departments"" d ON d.""Id"" = u.""DepartmentId""
+                    JOIN ""Municipalities"" m ON m.""Id"" = u.""MunicipalityId""
+                    WHERE u.""Id"" = new_id;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_get_all_users()
+                RETURNS TABLE(
+                    ""Id"" int,
+                    ""Name"" text,
+                    ""Phone"" text,
+                    ""CountryId"" int,
+                    ""DepartmentId"" int,
+                    ""MunicipalityId"" int,
+                    ""Direction"" text,
+                    ""CountryName"" text,
+                    ""DepartmentName"" text,
+                    ""MunicipalityName"" text
+                )
+                AS $$
+                BEGIN
+                    RETURN QUERY
+                    SELECT
+                        u.""Id"", u.""Name"", u.""Phone"", u.""CountryId"", u.""DepartmentId"", u.""MunicipalityId"", u.""Direction"",
+                        c.""Name"" AS ""CountryName"",
+                        d.""Name"" AS ""DepartmentName"",
+                        m.""Name"" AS ""MunicipalityName""
+                    FROM ""Users"" u
+                    JOIN ""Countries"" c ON c.""Id"" = u.""CountryId""
+                    JOIN ""Departments"" d ON d.""Id"" = u.""DepartmentId""
+                    JOIN ""Municipalities"" m ON m.""Id"" = u.""MunicipalityId"";
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_get_all_countries()
+                RETURNS TABLE(
+                    ""Id"" int,
+                    ""Name"" text
+                )
+                AS $$
+                BEGIN
+                    RETURN QUERY
+                    SELECT c.""Id"", c.""Name""
+                    FROM ""Countries"" c;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_get_all_departments()
+                RETURNS TABLE(
+                    ""Id"" int,
+                    ""Name"" text
+                )
+                AS $$
+                BEGIN
+                    RETURN QUERY
+                    SELECT d.""Id"", d.""Name""
+                    FROM ""Departments"" d;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_get_all_municipalities()
+                RETURNS TABLE(
+                    ""Id"" int,
+                    ""Name"" text
+                )
+                AS $$
+                BEGIN
+                    RETURN QUERY
+                    SELECT m.""Id"", m.""Name""
+                    FROM ""Municipalities"" m;
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
         }
 
         /// <inheritdoc />
@@ -122,6 +268,15 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Municipalities");
+
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_create_user(text, text, int, int, int, text);");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_country_exists(int);");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_department_exists(int);");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_municipality_exists(int);");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_users();");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_countries();");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_departments();");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_municipalities();");
         }
     }
 }
