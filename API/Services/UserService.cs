@@ -12,17 +12,17 @@ public class UserService(AppDbContext context) : IUserService
     public async Task<AppUser> CreateUserAsync(AppUser user)
     {
         var countryExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_country_exists({user.CountryId})")
+            .SqlQuery<bool>($"SELECT sp_country_exists({user.CountryId}) AS \"Value\"")
             .FirstOrDefaultAsync();
         if (!countryExists) throw new ArgumentException("El CountryId no existe.");
 
         var departmentExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_department_exists({user.DepartmentId})")
+            .SqlQuery<bool>($"SELECT sp_department_exists({user.DepartmentId}) AS \"Value\"")
             .FirstOrDefaultAsync();
         if (!departmentExists) throw new ArgumentException("El DepartmentId no existe.");
 
         var municipalityExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_municipality_exists({user.MunicipalityId})")
+            .SqlQuery<bool>($"SELECT sp_municipality_exists({user.MunicipalityId}) AS \"Value\"")
             .FirstOrDefaultAsync();
         if (!municipalityExists) throw new ArgumentException("El MunicipalityId no existe.");
 

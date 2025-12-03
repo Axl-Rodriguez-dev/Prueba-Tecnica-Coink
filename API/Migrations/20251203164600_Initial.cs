@@ -161,7 +161,7 @@ namespace API.Migrations
                 BEGIN
                     INSERT INTO ""Users"" (""Name"", ""Phone"", ""CountryId"", ""DepartmentId"", ""MunicipalityId"", ""Direction"")
                     VALUES (p_name, p_phone, p_country_id, p_department_id, p_municipality_id, p_direction)
-                    RETURNING ""Id"" INTO new_id;
+                    RETURNING ""Users"".""Id"" INTO new_id;
 
                     RETURN QUERY
                     SELECT
