@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Interfaces;
 using API.Services;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
