@@ -11,6 +11,11 @@ public class UserService(AppDbContext context) : IUserService
 {
     public async Task<AppUser> CreateUserAsync(AppUser user)
     {
+        var phoneExists = await context.Database
+            .SqlQuery<bool>($"SELECT sp_phone_exists({user.Phone}) AS \"Value\"")
+            .FirstOrDefaultAsync();
+        if (phoneExists) throw new ArgumentException("El número de teléfono ya existe.");
+
         var countryExists = await context.Database
             .SqlQuery<bool>($"SELECT sp_country_exists({user.CountryId}) AS \"Value\"")
             .FirstOrDefaultAsync();

@@ -134,6 +134,15 @@ namespace API.Migrations
                 $$ LANGUAGE plpgsql;
             ");
 
+            migrationBuilder.Sql(@"
+                CREATE OR REPLACE FUNCTION sp_phone_exists(p_phone text)
+                RETURNS boolean AS $$
+                BEGIN
+                    RETURN EXISTS(SELECT 1 FROM ""Users"" u WHERE u.""Phone"" = p_phone);
+                END;
+                $$ LANGUAGE plpgsql;
+            ");
+
       
             migrationBuilder.Sql(@"
                 CREATE OR REPLACE FUNCTION sp_create_user(
@@ -273,6 +282,7 @@ namespace API.Migrations
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_country_exists(int);");
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_department_exists(int);");
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_municipality_exists(int);");
+            migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_phone_exists(text);");
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_users();");
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_countries();");
             migrationBuilder.Sql(@"DROP FUNCTION IF EXISTS sp_get_all_departments();");
