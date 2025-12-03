@@ -12,22 +12,34 @@ public class UserService(AppDbContext context) : IUserService
     public async Task<AppUser> CreateUserAsync(AppUser user)
     {
         var phoneExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_phone_exists({user.Phone}) AS \"Value\"")
+            .SqlQueryRaw<bool>(
+                @"SELECT sp_phone_exists(@phone) AS ""Value""",
+                new NpgsqlParameter("@phone", user.Phone)
+            )
             .FirstOrDefaultAsync();
         if (phoneExists) throw new ArgumentException("El número de teléfono ya existe.");
 
         var countryExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_country_exists({user.CountryId}) AS \"Value\"")
+            .SqlQueryRaw<bool>(
+                @"SELECT sp_country_exists(@countryId) AS ""Value""",
+                new NpgsqlParameter("@countryId", user.CountryId)
+            )
             .FirstOrDefaultAsync();
         if (!countryExists) throw new ArgumentException("El CountryId no existe.");
 
         var departmentExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_department_exists({user.DepartmentId}) AS \"Value\"")
+            .SqlQueryRaw<bool>(
+                @"SELECT sp_department_exists(@departmentId) AS ""Value""",
+                new NpgsqlParameter("@departmentId", user.DepartmentId)
+            )
             .FirstOrDefaultAsync();
         if (!departmentExists) throw new ArgumentException("El DepartmentId no existe.");
 
         var municipalityExists = await context.Database
-            .SqlQuery<bool>($"SELECT sp_municipality_exists({user.MunicipalityId}) AS \"Value\"")
+            .SqlQueryRaw<bool>(
+                @"SELECT sp_municipality_exists(@municipalityId) AS ""Value""",
+                new NpgsqlParameter("@municipalityId", user.MunicipalityId)
+            )
             .FirstOrDefaultAsync();
         if (!municipalityExists) throw new ArgumentException("El MunicipalityId no existe.");
 
