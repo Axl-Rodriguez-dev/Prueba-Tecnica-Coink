@@ -52,3 +52,13 @@ dotnet ef database update --project API
 ```sh
 dotnet run --project API
 ```
+
+## Colección de Postman
+
+En el repositorio se incluye un archivo JSON con todas las peticiones para probar la API en Postman.
+
+Para usarlo:
+
+- Abre Postman.
+- Ve a "Import" y selecciona el archivo JSON de la colección que está en este repositorio.
+- Ajusta la variable/base URL si es necesario (por defecto: `http://localhost:5000` o el puerto configurado por `dotnet run`).
